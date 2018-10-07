@@ -42,6 +42,13 @@ function setup() {
     transducer = new SonicTransducer(1,27);
 }
 
+function angleBetween(vectorA, vectorB) {
+    var dot = vectorA.dot(vectorB);
+    var lengthA = vectorA.length();
+    var lengthB = vectorB.length();
+    return Math.acos( dot / (lengthA * lengthB) );
+}
+
 function draw() {
     background(51);
     
@@ -63,25 +70,33 @@ function draw() {
     sonicWaveParticles.forEach((sonicWaveParticle) => {
         sonicWaveParticle.update(0.01 * tscl);
         var collisionMedium;
+        var lastCollision;
         world.forEach((medium) => {
-            if(medium.checkCollision(sonicWaveParticle.pos.x, sonicWaveParticle.pos.y)) {
-                collisionMedium = medium;
-            }
+            //if(medium != sonicWaveParticle.medium) {
+                var collision = medium.checkCollision(sonicWaveParticle.pos.x, sonicWaveParticle.pos.y)
+                if(collision.hasCollision) {
+                    collisionMedium = medium;
+                    lastCollision = collision;
+                }
+            //}
         });
 
         if(collisionMedium && collisionMedium != sonicWaveParticle.medium) {
+            strokeWeight(4);
+            stroke(255,0,0);
+            line(lastCollision.nearestSide.start.x / scl, lastCollision.nearestSide.start.y / scl, lastCollision.nearestSide.stop.x / scl, lastCollision.nearestSide.stop.y / scl);
             var transmissionsfaktor = 2*collisionMedium.Z / (sonicWaveParticle.medium.Z + collisionMedium.Z);
             var reflexionsfaktor = (sonicWaveParticle.medium.Z - collisionMedium.Z) / (sonicWaveParticle.medium.Z + collisionMedium.Z);
             
-            sonicWaveParticle.vel.mult(-1);
-            sonicWaveParticle.magn = 0.5 * sonicWaveParticle.magn;
-
             var transmittingWave = new SonicWave(sonicWaveParticle.pos.x, sonicWaveParticle.pos.y);
             transmittingWave.magn = sonicWaveParticle.magn;
-            transmittingWave.vel = createVector(1,0);
+            transmittingWave.vel = sonicWaveParticle.vel.copy();
             transmittingWave.medium = collisionMedium;
             transmittingWave.vel.setMag(collisionMedium.c);
             sonicWaveParticles.push(transmittingWave);
+            
+            sonicWaveParticle.vel.mult(-1);
+            sonicWaveParticle.magn = 0.5 * sonicWaveParticle.magn;
         }
         
         sonicWaveParticle.show();
