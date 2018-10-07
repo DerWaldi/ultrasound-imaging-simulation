@@ -34,7 +34,7 @@ class Medium {
         // the next vertex in the list
         var next = 0;
         var nearestSide;
-        var nearestDist = 10000;
+        var nearestDist = 1000000;
         for (var current=0; current<this.vertices.length; current++) {
     
             // get next vertex in list
@@ -46,6 +46,7 @@ class Medium {
             // this makes our if statement a little cleaner
             var vc = this.vertices[current];    // c for "current"
             var vn = this.vertices[next];       // n for "next"
+            var tangente;
         
             // compare position, flip 'collision' variable
             // back and forth
@@ -57,12 +58,16 @@ class Medium {
                     nearestDist = curDist;
                     nearestSide = {
                         start: vn.copy(),
-                        stop: vc.copy(),
-                        tangente: p5.Vector.sub(vn, vc)
+                        stop: vc.copy()
                     };
+                    tangente = p5.Vector.sub(nearestSide.start, nearestSide.stop);
                 }
             }
         }
-        return {hasCollision: hasCollision, nearestSide:nearestSide};
+        return {
+            hasCollision: hasCollision, 
+            nearestSide:nearestSide,
+            tangente: tangente
+        };
     }
 }

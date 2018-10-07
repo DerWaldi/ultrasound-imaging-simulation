@@ -44,8 +44,8 @@ function setup() {
 
 function angleBetween(vectorA, vectorB) {
     var dot = vectorA.dot(vectorB);
-    var lengthA = vectorA.length();
-    var lengthB = vectorB.length();
+    var lengthA = vectorA.mag();
+    var lengthB = vectorB.mag();
     return Math.acos( dot / (lengthA * lengthB) );
 }
 
@@ -87,15 +87,16 @@ function draw() {
             line(lastCollision.nearestSide.start.x / scl, lastCollision.nearestSide.start.y / scl, lastCollision.nearestSide.stop.x / scl, lastCollision.nearestSide.stop.y / scl);
             var transmissionsfaktor = 2*collisionMedium.Z / (sonicWaveParticle.medium.Z + collisionMedium.Z);
             var reflexionsfaktor = (sonicWaveParticle.medium.Z - collisionMedium.Z) / (sonicWaveParticle.medium.Z + collisionMedium.Z);
-            
+
             var transmittingWave = new SonicWave(sonicWaveParticle.pos.x, sonicWaveParticle.pos.y);
             transmittingWave.magn = sonicWaveParticle.magn;
             transmittingWave.vel = sonicWaveParticle.vel.copy();
             transmittingWave.medium = collisionMedium;
             transmittingWave.vel.setMag(collisionMedium.c);
             sonicWaveParticles.push(transmittingWave);
-            
-            sonicWaveParticle.vel.mult(-1);
+            if(lastCollision && lastCollision.tangente) {
+                sonicWaveParticle.vel.rotate(-1 * (lastCollision.tangente.angleBetween(sonicWaveParticle.vel)-Math.PI/2 -Math.PI));
+            }
             sonicWaveParticle.magn = 0.5 * sonicWaveParticle.magn;
         }
         
