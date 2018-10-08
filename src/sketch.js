@@ -10,8 +10,11 @@ var world = [];
 var sonicWaveParticles = [];
 var transducer;
 
+var canvas;
+var formulasP;
+
 function setup() {
-    createCanvas(500,500);
+    canvas = createCanvas(500,500);
     
     air = new Medium(330, // m/s
         403, // Ns/m^3
@@ -40,6 +43,15 @@ function setup() {
     world.push(water);
 
     transducer = new SonicTransducer(1,27);
+
+    formulasP = createP(
+        "<b>Akustischer Brechungsindex:</b>" + 
+        "$${n = \\frac{\\sin \\alpha}{\\sin \\beta} = \\frac{c_1}{c_2}}$$" +
+        "<b>Reflexionssfaktor:</b>" + 
+        "$${\\rho = \\frac{Z_0 - Z_1}{Z_0 + Z_1}}$$" +
+        "<b>Transmissionsfaktor:</b>" + 
+        "$${\\tau = \\frac{2*Z_1}{Z_0 + Z_1}}$$"
+    );
 }
 
 function angleBetween(vectorA, vectorB) {
